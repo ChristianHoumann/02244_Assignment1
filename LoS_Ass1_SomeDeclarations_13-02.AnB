@@ -1,0 +1,28 @@
+Protocol: Secure Electronic Payment
+
+Types:
+  Agent Customer,Gateway,Merchant;
+  Symmetric_key SecretKey
+  Function pk
+  Number Pricing,Order,CreditCard
+
+
+Knowledge:  # Everyone knows the identity of eachother
+  # The payment app know all public keys
+  Customer: Customer, Gateway, Merchant, SecretKey , pk(Customer), inv(pk(Customer), pk(Gateway), pk(Merchant), CreditCard, Order
+  # The payment app and gateway share a secret key
+  Gateway: Customer, Gateway, Merchant, SecretKey
+  Merchant: Customer, Gateway, Merchant
+
+Actions:
+  
+
+Goals:
+  # The starting secret key between customer and gateway should remain secret
+  SecretKey secret between Customer, Gateway
+  # The Order should not be known by the gateway
+  Order secret between Customer, Merchant
+  # The Merchant should not know the credit card information
+  CreditCard secret between Customer, Gateway
+
+  # Outsiders should not be able to observe anythong about the contents of messages
