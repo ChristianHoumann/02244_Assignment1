@@ -1,28 +1,43 @@
-Protocol: Secure Electronic Payment
+#Problem with this file: (what attack is found/what change should be made)
+#
+
+Protocol: keyex
 
 Types:
   Agent Customer,Gateway,Merchant;
-  Symmetric_key SecretKey
-  Function pk
+  Symmetric_key SecretKey,CMSecretKey;
+  Function pk;
   Number Pricing,Order,CreditCard
 
 
 Knowledge:  # Everyone knows the identity of eachother
   # The payment app know all public keys
-  Customer: Customer, Gateway, Merchant, SecretKey , pk(Customer), inv(pk(Customer), pk(Gateway), pk(Merchant), CreditCard, Order
+  Customer: Customer, Gateway, Merchant, SecretKey , pk(Customer), inv(pk(Customer), pk(Gateway), pk(Merchant), CreditCard, Order;
   # The payment app and gateway share a secret key
-  Gateway: Customer, Gateway, Merchant, SecretKey
+  Gateway: Customer, Gateway, Merchant, SecretKey;
   Merchant: Customer, Gateway, Merchant
 
 Actions:
-  
+  Customer -> Merchant : Customer,Merchant,{Order}inv(pk(Customer))
+  Merchant -> Customer : Merchant,Customer,{Pricing}inv(pk(Merchant))
+  Customer -> Gateway : Customer,Gateway,{|{CreditCard}inv(pk(Customer)),Pricing,{Order}CMSecretKey|}SecretKey
+  Gateway -> Merchant : Gateway,Merchant,Pricing
 
 Goals:
   # The starting secret key between customer and gateway should remain secret
-  SecretKey secret between Customer, Gateway
+  SecretKey secret between Customer,Gateway
   # The Order should not be known by the gateway
-  Order secret between Customer, Merchant
+  Order secret between Customer,Merchant
   # The Merchant should not know the credit card information
-  CreditCard secret between Customer, Gateway
+  CreditCard secret between Customer,Gateway
+
+  # Accountability goal: the customer cannot later deny a transaction
+
+    
 
   # Outsiders should not be able to observe anythong about the contents of messages
+
+  # gateway should check credit card ??????
+  Gateway authenticates CreditCard on SecretKey
+
+
