@@ -1,0 +1,47 @@
+Protocol: KeyEx
+#Problem with this file: (what attack is found/what change should be made)
+# Necessary messages are sent, but not securely (only communication between customer and gateway is secure)
+
+Types:
+
+	# Customer, Merchant and Gateway
+  Agent C,M,G;
+  Number Pricing,Order,CreditCard;
+  Symmetric_key KAB,CM;
+	# public key, shared key and hash function
+  Function pk,sk,h;
+
+Knowledge:
+
+  C: C, M, G, pk(M), pk(G), sk(C,G), h;
+  # Only merchant has a public/private key pair
+  M: C, M, G, pk(M), pk(G), inv(pk(M)), h;
+  G: C, M, G, pk(M), pk(G), inv(pk(G)), sk(C,G);
+
+Actions:
+
+C->M: {C, M, Order, h(Order), KAB}pk(M)
+M->C: {|C, M, Pricing|}KAB
+  # Since the gateway should not know the order, a hash function of it is sent instead
+C->G: {|C, G, CreditCard, Pricing, h(Order)|}sk(C,G)
+G->C: {|C, G|}sk(C,G)
+C->G: {|C, G|}sk(C,G)
+G->M: {{G, M, Pricing, h(Order)}inv(pk(G))}pk(M)
+
+Goals:
+
+sk(C,G) secret between C, G
+# Order secret between C, M
+C->*M:Order
+CreditCard secret between C, G
+# KAB secret between C,G
+# C authenticates G on KAB
+
+
+# C authenticates G on KAB
+# KAB secret between C,G
+# CM secret between C,M
+
+
+
+
