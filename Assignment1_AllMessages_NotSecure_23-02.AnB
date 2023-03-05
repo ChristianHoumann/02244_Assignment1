@@ -7,33 +7,35 @@ Types:
 	# Customer, Merchant and Gateway
   Agent C,M,G;
   Number Pricing,Order,CreditCard;
-  Symmetric_key KAB,CM;
+  Symmetric_key KCM,CM;
 	# public key, shared key and hash function
   Function pk,sk,h;
 
 Knowledge:
 
-  C: C, M, G, pk(M), sk(C,G), h;
+  C: C, M, G, pk(M), pk(G), sk(C,G), h;
   # Only merchant has a public/private key pair
-  M: C, M, G, pk(M), inv(pk(M)), h;
-  G: C, M, G, pk(M), sk(C,G);
+  M: C, M, G, pk(M), pk(G), inv(pk(M)), h;
+  G: C, M, G, pk(M), pk(G), inv(pk(G)), sk(C,G);
 
 Actions:
 
-C->M: C, M, Order, h(Order)
-M->C: C, M, Pricing
+C->M: {C, M, Order, h(Order), KCM}pk(M)
+M->C: {|C, M, Pricing|}KCM
   # Since the gateway should not know the order, a hash function of it is sent instead
 C->G: {|C, G, CreditCard, Pricing, h(Order)|}sk(C,G)
 G->C: {|C, G|}sk(C,G)
 # ↓A message from C to G has to be included for the program to work for some reason
 C->G: {|C, G|}sk(C,G)
-G->M: G, M, Pricing, h(Order)
+G->M: {G, M, Pricing, h(Order)}pk(M)
+#M->C: maybe????
 
 Goals:
-
 sk(C,G) secret between C, G
-Order secret between C, M
 CreditCard secret between C, G
+C->*M:Order
+#Order secret between C, M
+
 # KAB secret between C,G
 # C authenticates G on KAB
 
@@ -41,5 +43,6 @@ CreditCard secret between C, G
 # C authenticates G on KAB
 # KAB secret between C,G
 # CM secret between C,M
+
 
 
