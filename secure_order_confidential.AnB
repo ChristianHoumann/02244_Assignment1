@@ -17,27 +17,27 @@ Knowledge:
   # Only merchant has a public/private key pair
   M: C, M, G, pk(M), pk(G), inv(pk(M)), h, pre;
   G: C, M, G, pk(M), pk(G), inv(pk(G)), sk(C,G), pre;
+  where C!=M
 
 Actions:
 
 C->M: {C, M, Order, h(Order), KAB, NC}pk(M)
-M->C: {|C, M, Pricing, pre(NC)|}KAB
+M->C: {|M, C, Pricing, pre(NC)|}KAB
   # Since the gateway should not know the order, a hash function of it is sent instead
-C->G: {|C, G, NC2|}sk(C,G)
-G->C: {|C, G, pre(NC2)|}sk(C,G)
-C->G: {|C, G, CreditCard, Pricing, h(Order)|}sk(C,G)
+C->G: {|C, G, CreditCard, Pricing, h(Order), NC2|}sk(C,G)
+G->C: {|G, C, pre(NC2)|}sk(C,G)
+C->G: {|C, G|}sk(C,G)
 G->M: {{G, M, Pricing, h(Order)}inv(pk(G))}pk(M)
-M->C: {|NM|}KAB
-C->M: {|pre(NM)|}KAB
+# M->C: {|M, C, NM|}KAB
+# C->M: {|C, M, pre(NM)|}KAB
 
 Goals:
 
 sk(C,G) secret between C, G
 CreditCard secret between C, G
-#KAB secret between C, M
-M weakly authenticates C on KAB, Order
-G weakly authenticates M on Pricing
+# KAB secret between C, M
+# M weakly authenticates C on KAB, Order
+# G weakly authenticates M on Pricing
 Pricing secret between C,M,G
-
 C->*M:Order
 
