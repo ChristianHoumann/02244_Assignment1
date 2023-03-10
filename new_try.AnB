@@ -6,7 +6,7 @@ Types:
 
 	# Customer, Merchant and Gateway
   Agent C,M,g;
-  Number Pricing,Order,CreditCard,NC,NM,NC2,No;
+  Number Pricing,Order,CreditCard,NC,NM,NC2,No,X,Y,k;
   Symmetric_key KAB;
 	# public key, shared key and hash function
   Function pk,sk,h,pre;
@@ -21,27 +21,27 @@ Knowledge:
 
 Actions:
 
-g->C: {|g,C,KAB|}sk(C,g)
-C*->*M: {C, M, Order, h(Order), KAB, NC}pk(M)
-M->C: {|M, C, Pricing, pre(NC)|}KAB
+C->M: {C, M, exp(k,X),KAB}pk(M)
+M->C: {|M, C, exp(k,Y)|}KAB
+C->M: {C, M, Order, h(Order), KAB, NC, exp(k,X)}pk(M)
+M->C: {|M, C, Pricing, pre(NC),exp(k,Y)|}exp(exp(k,X ),Y)
   # Since the gateway should not know the order, a hash function of it is sent instead
-C->g: {|C, g, CreditCard, Pricing, h(Order),NC2|}sk(C,g)
-#g->C: {|g, C, pre(NC2)|}sk(C,g)
-#C->g: {|C, g|}sk(C,g)
-#g->M: {{C, g, M, Pricing, h(Order)}inv(pk(g)), No}KAB
-#M->C: {|M, C, NM|}KAB
-#C->M: {|C, M, pre(NM)|}KAB
+C->g: {|C, g, CreditCard, Pricing, h(Order), NC2|}sk(C,g)
+g->C: {|g, C, pre(NC2)|}sk(C,g)
+C->g: {|C, g|}sk(C,g)
+g->M: {{C, g, M, Pricing, h(Order)}inv(pk(g)), No}pk(M)
+#M->C: {|M, C, NM|}exp(exp(k,X ),Y)
+#C->M: {|C, M, pre(NM)|}exp(exp(k,X ),Y)
 
 Goals:
 
 sk(C,g) secret between C,g
 CreditCard secret between C,g
-KAB secret between C,M,g
-#M weakly authenticates C on KAB, Order
-#g weakly authenticates M on Pricing
-#Pricing secret between C,M,g
+KAB secret between C, M
+# M weakly authenticates C on KAB, Order
+# g weakly authenticates M on Pricing
+#Pricing secret between C,M,G
 C->*M:Order
-
 
 
 
