@@ -1,12 +1,10 @@
-Protocol: KeyEx
-#Problem with this file: (what attack is found/what change should be made)
-# Necessary messages are sent, but not securely (only communication between customer and gateway is secure)
+Protocol: Secure payment protocol
 
 Types:
 
     # Customer, Merchant and Gateway
   Agent C,M,g;
-  Number Pricing,Order,CreditCard,NC,NM,NC2,No;
+  Number Pricing,Order,CreditCard,NC,NM,NC2;
   Symmetric_key KAB;
     # public key, shared key and hash function
   Function pk,sk,h,pre;
@@ -14,7 +12,7 @@ Types:
 Knowledge:
 
   C: C, M, g, pk(M), pk(g), sk(C,g), h, pre;
-  # Only merchant has a public/private key pair
+  # Only merchant and gateway have a public/private key pair
   M: C, M, g, pk(M), pk(g), inv(pk(M)), h, pre;
   g: C, M, g, pk(M), pk(g), inv(pk(g)), sk(C,g), pre;
   where C!=M
@@ -24,24 +22,20 @@ Actions:
 g*->C: {|g, C, M,KAB|}sk(C,g)
 C->g: {|C, g, M|}sk(C,g)
 g*->M: {g, M, C,KAB}pk(M)
-M->C: {|C, M|}KAB
+M->C: {|M, C|}KAB
 C->M: {{|C, M, Order, h(Order), NC|}KAB}pk(M)
 M->C: {|M, C, Pricing, pre(NC)|}KAB
   # Since the gateway should not know the order, a hash function of it is sent instead
 C->g: {|C, g, M, CreditCard, Pricing, h(Order),NC2|}sk(C,g)
 g*->C: {|g, C, pre(NC2)|}sk(C,g)
 C->g: {|C, g|}sk(C,g)
-g*->M: {{C, g, Pricing, h(Order)}inv(pk(g)), No}KAB
-M->C: {|M, C, NM|}KAB
-C->M: {|C, M, pre(NM)|}KAB
+g*->M: {{g, M, C, Pricing, h(Order)}inv(pk(g))}KAB
 
 Goals:
 
 sk(C,g) secret between C,g
 CreditCard secret between C,g
 KAB secret between C,M,g
-# M weakly authenticates C on KAB, Order
-# g weakly authenticates M on Pricing
 Pricing secret between C,M
-C->*M:Order
 Order secret between C, M
+
