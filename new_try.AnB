@@ -13,9 +13,9 @@ Types:
 
 Knowledge:
 
-  C: C, M, g, pk(M), pk(g), sk(C,g), h, pre;
+  C: C, M, g, pk(M), pk(g), sk(C,g), h, pre, k;
   # Only merchant has a public/private key pair
-  M: C, M, g, pk(M), pk(g), inv(pk(M)), h, pre;
+  M: C, M, g, pk(M), pk(g), inv(pk(M)), h, pre, k;
   g: C, M, g, pk(M), pk(g), inv(pk(g)), sk(C,g), pre;
   where C!=M
 
@@ -42,6 +42,7 @@ KAB secret between C, M
 # g weakly authenticates M on Pricing
 #Pricing secret between C,M,G
 C->*M:Order
+
 
 
 
